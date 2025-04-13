@@ -7,7 +7,7 @@
       "start": "vite --open",
       "start-local": "vite --config ../../vite.config.local.mjs",
       "build": "vite build",
-      "build-gh": "vite build --config vite.config"
+      "build-gh": "vite build --config vite.config.js"
     },
     "dependencies": {
       "@types/react": "^18.0.0",

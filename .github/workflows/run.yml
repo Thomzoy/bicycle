@@ -31,8 +31,7 @@ jobs:
           cd app
           npm install
           npm run build
-          cd ..
-          cp data.json dist/assets/data.json
+          cp ../data.json dist/assets/data.json
       - name: gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:

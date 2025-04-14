@@ -1,0 +1,110 @@
+$dark: #5d617c;
+html,
+body {
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+.loader {
+	background: $dark;
+	.full-height-svg {
+		height: 100vh;
+	}
+	.center {
+		display: flex !important;
+		justify-content: center !important;
+		flex-direction: column !important;
+		#svg {
+			width: 40%;
+			margin: auto;
+			transform: translate(-10%, 0);
+		}
+	}
+}
+
+// THE BASIC OF SVG FILE CSS //
+.cls-1 {
+	fill: #e6e6e6;
+}
+.cls-10,
+.cls-2,
+.cls-3,
+.cls-4 {
+	fill: none;
+}
+.cls-2,
+.cls-3 {
+	stroke-width: 3px;
+}
+.cls-2 {
+	stroke-miterlimit: 10;
+	stroke: #333;
+}
+.cls-3 {
+	stroke: #bff1ff;
+	stroke-dasharray: 50 50 180;
+}
+.cls-10,
+.cls-3,
+.cls-4 {
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+.cls-4 {
+	stroke: #3fa9f5;
+}
+.cls-10,
+.cls-4 {
+	stroke-width: 4px;
+}
+.cls-10 {
+	stroke: #f2f2f2;
+}
+//END OF THE BASIC OF SVG FILE CSS //
+
+//THE ANIMATION
+#animateThis {
+	stroke-dasharray: 50 1000;
+}
+#animateThis2 {
+	stroke-dasharray: 50 1000;
+}
+
+#effects2,
+#effects4,
+#effects6,
+#effects8,
+#effects10 {
+	stroke: #bff1ff;
+	stroke-dasharray: 10 1000;
+	animation: stroke1 1s infinite;
+}
+#effects1,
+#effects3,
+#effects5,
+#effects7,
+#effects9 {
+	stroke-dasharray: 10 1000;
+	animation: stroke2 0.7s infinite;
+}
+
+@keyframes stroke1 {
+	from {
+		stroke-dasharray: 0 1000;
+		opacity: 1;
+	}
+	to {
+		stroke-dasharray: 100 1000;
+		opacity: 0;
+	}
+}
+@keyframes stroke2 {
+	from {
+		stroke-dasharray: 0 1000;
+		opacity: 1;
+	}
+	to {
+		stroke-dasharray: 50 1000;
+		opacity: 0;
+	}
+}

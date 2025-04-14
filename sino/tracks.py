@@ -64,15 +64,18 @@ def clean(
         tracks = df.groupby("trackID_tmp", as_index=False).agg(
             start_date=("date", "min"),
             end_date=("date", "max"),
-            mean_speed=("nSpeed", "mean"),
+            #mean_speed=("nSpeed", "mean"),
             max_speed=("nSpeed", "max"),
+            dist_total=("dist_total", "max"),
         )
         tracks["duration"] = (tracks.end_date - tracks.start_date).dt.seconds / 60
+        tracks["mean_speed"] = tracks.dist_total / (tracks.duration / 60)
         tracks = tracks[
             (tracks.max_speed >= min_max_speed_for_valid_tracks)
             & (tracks.max_speed <= max_max_speed_for_valid_tracks)
             & (tracks.duration >= min_duration)
         ]
+        tracks["formatted_start_date"] = tracks.start_date.dt.strftime("%Y-%m-%d,%H:%M")
         return tracks
 
     def distance(row):
@@ -95,7 +98,11 @@ def clean(
         df_track = df_track.iloc[min_point : len(df_track) - max_point]
         df_track["dbLat_prev"] = df_track.dbLat.shift()
         df_track["dbLon_prev"] = df_track.dbLon.shift()
-        df_track["dist"] = df_track.apply(distance, axis=1)
+        df_track["dist"] = df_track.apply(distance, axis=1) / 1e3
+        df_track["duration"] = (df_track.date - df_track.date_prev).dt.seconds / 60
+        df_track["dist_total"] = df_track["dist"].cumsum()
+        df_track["duration_total"] = df_track["duration"].cumsum()
+        
         return df_track
 
     cleaned_points = [

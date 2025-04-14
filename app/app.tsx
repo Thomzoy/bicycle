@@ -453,7 +453,7 @@ const StatisticsModal = ({
 
       const totalDistance = tripStats.reduce((sum, trip) => sum + trip.distance, 0);
       const totalDuration = tripStats.reduce((sum, trip) => sum + trip.duration, 0);
-      const meanSpeed = totalDuration > 0 ? (totalDistance / totalDuration) * 60 : 0; // km/h
+      const meanSpeed = totalDuration > 0 ? (totalDistance / totalDuration) : 0; // km/h
       const maxSpeed = Math.max(...tripStats.map(trip => trip.max_speed));
       const dPlus = tripStats.reduce((sum, trip) => sum + trip.dPlus, 0);
       const numberOfTrips = tripsToUse.length;

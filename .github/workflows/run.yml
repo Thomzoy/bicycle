@@ -1,6 +1,8 @@
 name: Create App
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 on:
   workflow_dispatch:
 
@@ -33,9 +35,13 @@ jobs:
           npm install
           npm run build-gh
           cp ../data.json dist/data.json
-      - name: gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages
-          folder: app/dist/
-          clean: true  # Set to true if you want to remove old files
+          # Upload dist folder
+          path: './dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

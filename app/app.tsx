@@ -5,7 +5,7 @@ import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core';
 import DeckGL from '@deck.gl/react';
 import { PolygonLayer } from '@deck.gl/layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
-import { animate } from 'popmotion';
+import { animate, easeOut } from 'popmotion';
 import { WebMercatorViewport } from '@deck.gl/core';
 import './animated_bicycle/animation.scss';
 
@@ -769,8 +769,18 @@ const TrackInfoPanel = ({ trips, activeTrips }: {
 // ProgressBar component
 const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
   const maxDistance = 1000; // 1000km goal
-  const progress = Math.min((totalDistance / maxDistance) * 100, 100);
-  const milestones = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+
+  useEffect(() => {
+    const progress = (totalDistance / maxDistance) * 100;
+    animate({
+      from: 0,
+      to: progress,
+      duration: 3000,
+      ease: easeOut,
+      onUpdate: setAnimatedProgress
+    });
+  }, [totalDistance]);
 
   return (
     <div
@@ -793,15 +803,14 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
         background: 'rgba(255, 255, 255, 0.1)',
         borderRadius: '10px',
         position: 'relative',
-        marginBottom: '5px'
       }}>
         <div
           style={{
-            width: `${progress}%`,
+            width: `${animatedProgress}%`,
             height: '100%',
             background: 'linear-gradient(90deg, #4CAF50, #8BC34A)',
             borderRadius: '10px',
-            transition: 'width 0.3s ease'
+            // transition: 'width 1s ease'
           }}
         />
         <div style={{
@@ -815,19 +824,6 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
         }}>
           {totalDistance.toFixed(1)} km / {maxDistance} km
         </div>
-      </div>
-      <div style={{
-        width: '90%',
-        display: 'flex',
-        justifyContent: 'space-between',
-        color: 'white',
-        fontSize: '12px'
-      }}>
-        {milestones.map((km) => (
-          <div key={km} style={{ textAlign: 'center' }}>
-            {km}km
-          </div>
-        ))}
       </div>
     </div>
   );

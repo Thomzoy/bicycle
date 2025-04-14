@@ -1,5 +1,8 @@
 import json
 
+import pandas as pd
+pd.options.mode.chained_assignment = None
+
 from sino.scraper import get_points
 from sino.tracks import clean
 

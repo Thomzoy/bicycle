@@ -766,6 +766,73 @@ const TrackInfoPanel = ({ trips, activeTrips }: {
   );
 };
 
+// ProgressBar component
+const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
+  const maxDistance = 1000; // 1000km goal
+  const progress = Math.min((totalDistance / maxDistance) * 100, 100);
+  const milestones = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: '0',
+        left: '0',
+        right: '0',
+        background: 'rgba(0, 0, 0, 0.7)',
+        padding: '10px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        zIndex: 1
+      }}
+    >
+      <div style={{
+        width: '90%',
+        height: '20px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '10px',
+        position: 'relative',
+        marginBottom: '5px'
+      }}>
+        <div
+          style={{
+            width: `${progress}%`,
+            height: '100%',
+            background: 'linear-gradient(90deg, #4CAF50, #8BC34A)',
+            borderRadius: '10px',
+            transition: 'width 0.3s ease'
+          }}
+        />
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: 'white',
+          fontWeight: 'bold',
+          textShadow: '0 0 2px black'
+        }}>
+          {totalDistance.toFixed(1)} km / {maxDistance} km
+        </div>
+      </div>
+      <div style={{
+        width: '90%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        color: 'white',
+        fontSize: '12px'
+      }}>
+        {milestones.map((km) => (
+          <div key={km} style={{ textAlign: 'center' }}>
+            {km}km
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function App({
   buildings = DATA_URL.BUILDINGS,
   trips = DATA_URL.TRIPS,
@@ -783,6 +850,16 @@ export default function App({
   mapStyle?: string;
   theme?: Theme;
 }) {
+  // Add style tag to hide the control
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = '.maplibregl-ctrl-bottom-right { display: none; }';
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   const [time, setTime] = useState(0);
   const [animationSpeed, setAnimationSpeed] = useState(initialAnimationSpeed);
   const [currentTrailLength, setCurrentTrailLength] = useState(trailLength);
@@ -949,6 +1026,11 @@ export default function App({
     })
   ];
 
+  // Calculate total distance from all trips
+  const totalDistance = allTrips.reduce((sum, trip) => {
+    return sum + (trip.distances[trip.distances.length - 1] || 0);
+  }, 0);
+
   return (
     <>
       <DeckGL
@@ -981,6 +1063,7 @@ export default function App({
         allTrips={allTrips}
       />
       <TrackInfoPanel trips={filteredTrips} activeTrips={activeTrips} />
+      <ProgressBar totalDistance={totalDistance} />
     </>
   );
 }

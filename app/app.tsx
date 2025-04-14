@@ -55,7 +55,7 @@ const DEFAULT_THEME: Theme = {
 const INITIAL_VIEW_STATE: MapViewState = {
   longitude: 2.3446281,
   latitude: 48.854859,
-  zoom: 12,
+  zoom: 11,
   pitch: 45,
   bearing: 15
 };
@@ -438,10 +438,10 @@ const StatisticsModal = ({
       // Get final values for each trip
       const tripStats = tripsToUse.map(trip => {
         const finalDistance = trip.distances[trip.distances.length - 1] || 0;
-        const finalDuration = trip.timestamps[trip.timestamps.length - 1] / 60; // Convert seconds to minutes
+        const finalDuration = trip.timestamps[trip.timestamps.length - 1] / 3600; // Convert seconds to hours
         const finalSpeed = trip.speeds[trip.speeds.length - 1] || 0;
         const maxSpeed = trip.max_speed;
-        const dPlus = trip.d_plus[trip.d_plus.length - 1] || 0; // Get the last value of d_plus array
+        const dPlus = trip.d_plus[trip.d_plus.length - 1] || 0;
         return {
           distance: finalDistance,
           duration: finalDuration,
@@ -457,7 +457,7 @@ const StatisticsModal = ({
       const maxSpeed = Math.max(...tripStats.map(trip => trip.max_speed));
       const dPlus = tripStats.reduce((sum, trip) => sum + trip.dPlus, 0);
       const numberOfTrips = tripsToUse.length;
-      const meanTripDuration = numberOfTrips > 0 ? totalDuration / numberOfTrips : 0;
+      const meanTripDuration = numberOfTrips > 0 ? 60 * (totalDuration / numberOfTrips) : 0;
 
       setStats({
         totalDistance,
@@ -666,7 +666,7 @@ const StatisticsModal = ({
           textAlign: 'center',
           fontFamily: '"National Park", sans-serif'
         }}>
-          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Durée totale: {stats.totalDuration.toFixed(1)} minutes</div>
+          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Durée totale: {stats.totalDuration.toFixed(1)} heures</div>
         </div>
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
@@ -832,11 +832,11 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
 export default function App({
   buildings = DATA_URL.BUILDINGS,
   trips = DATA_URL.TRIPS,
-  trailLength = 800,
+  trailLength = 1500,
   initialViewState = INITIAL_VIEW_STATE,
   mapStyle = MAP_STYLE,
   theme = DEFAULT_THEME,
-  initialAnimationSpeed = 7,
+  initialAnimationSpeed = 10,
 }: {
   buildings?: string | Building[];
   trips?: string | Trip[];

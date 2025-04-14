@@ -483,19 +483,32 @@ const StatisticsModal = ({
         padding: '30px',
         borderRadius: '8px',
         minWidth: '400px',
+        maxHeight: '70vh',
         zIndex: 3,
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        // display: 'flex',
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         fontFamily: '"National Park", sans-serif'
       }}
     >
       <h2 style={{ margin: '0 0 20px 0', textAlign: 'center', fontFamily: '"National Park", sans-serif' }}>Statistiques</h2>
-      <div className="bicycle-animation">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 269 134.11" id="svg">
 
-
+      <div className="bicycle-animation" style={{
+        marginBottom: '20px',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 269 134.11"
+          id="svg"
+          style={{
+            width: '200px',
+            height: 'auto'
+          }}
+        >
           <g id="animationWheels" transform="rotate(0 101.5 92.61)" x="0" y="0">
             <animateTransform
               attributeName="transform"
@@ -520,7 +533,6 @@ const StatisticsModal = ({
             />
             <path id="animateThis2" className="cls-3" d="M268.5 96.5a34 34 0 1 1-34-34 34 34 0 0 1 34 34z" transform="translate(-7 -3.89)" />
           </g>
-
 
           <g id="wheels">
             <path className="cls-1" d="M161.85 93c2 0 3.82.61 4.34 1.16a3.46 3.46 0 0 1 .32 2c-.06 1.76-.42 2.85-1 3.24a6.25 6.25 0 0 1-3 .65h-.14L160 99.7l.23-1.08.46-2.12-.46-2.12-.23-1.11 1.82-.28m-.2-10H161l-13 2 2.5 11.5L148 108l13.25 2h1.22c3.54 0 13.6-1.1 14-13.55.47-12.69-11.83-13.45-14.82-13.45z" transform="translate(-7 -3.89)" />
@@ -548,7 +560,6 @@ const StatisticsModal = ({
             <path d="M108.5 91.5a5 5 0 1 0 5 5 5 5 0 0 0-5-5z" transform="translate(-7 -3.89)" fill="#333" /><path id="ok-5" data-name="ok" d="M155.5 77.61a14.86 14.86 0 0 0-4.5.69l-51 9.81a4.53 4.53 0 0 0 0 9l51 9.81a14.86 14.86 0 0 0 4.5.69 15 15 0 0 0 0-30z" fill="#b3b3b3" opacity=".5" stroke-width="3" stroke-miterlimit="10" stroke="#333" />
           </g>
 
-
           <g id="effects">
             <path id="effects10" stroke="#f2f2f2" fill="#998675" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" d="M104.5 32.61h-63" />
             <path id="effects9" className="cls-10" d="M104 42.11H75" />
@@ -561,9 +572,9 @@ const StatisticsModal = ({
             <path id="effects2" className="cls-10" d="M195 127.11h-23" />
             <path id="effects1" data-name="effects" className="cls-10" d="M184 120.11h-33" />
           </g>
-
         </svg>
       </div>
+
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -601,7 +612,16 @@ const StatisticsModal = ({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '15px', width: '100%' }}>
+      <div style={{
+        display: 'grid',
+        gap: '15px',
+        width: '100%',
+        overflowY: 'auto',
+        maxHeight: 'calc(70vh - 250px)', // Account for header, animation, toggle, and button
+        paddingRight: '10px',
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1)'
+      }}>
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
           padding: '15px',

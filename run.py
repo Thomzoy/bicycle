@@ -12,7 +12,7 @@ tracks, df = clean(points)
 paths = []
 for trackID, d in df.groupby("trackID"):
     track = tracks[tracks.trackID == trackID].squeeze()
-    values = d[["dbLat", "dbLon", "dist_total", "nSpeed", "duration_total"]].to_dict(orient="list")
+    values = d[["dbLat", "dbLon", "dist_total", "nSpeed", "duration_total", "elevation", "d_plus"]].to_dict(orient="list")
     path = list(zip(values["dbLon"], values["dbLat"]))
     timestamps = list(d.nTime - d.nTime.min())
     start = int(d.nTime.min())

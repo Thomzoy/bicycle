@@ -688,7 +688,7 @@ const TrackInfoPanel = ({ trips, activeTrips }: {
         fontSize: '14px',
         maxHeight: 'calc(100vh - 40px)',
         overflowY: 'auto',
-        minWidth: '300px',
+        // minWidth: '300px',
         zIndex: 1,
         fontFamily: '"National Park", sans-serif'
       }}

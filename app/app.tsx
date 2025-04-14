@@ -423,6 +423,7 @@ const StatisticsModal = ({
     meanSpeed: number;
     maxSpeed: number;
     numberOfTrips: number;
+    meanTripDuration: number;
   } | null>(null);
   const [showAllTrips, setShowAllTrips] = useState(false);
 
@@ -450,13 +451,15 @@ const StatisticsModal = ({
       const meanSpeed = totalDuration > 0 ? (totalDistance / totalDuration) * 60 : 0; // km/h
       const maxSpeed = Math.max(...tripStats.map(trip => trip.max_speed));
       const numberOfTrips = tripsToUse.length;
+      const meanTripDuration = numberOfTrips > 0 ? totalDuration / numberOfTrips : 0;
 
       setStats({
         totalDistance,
         totalDuration,
         meanSpeed,
         maxSpeed,
-        numberOfTrips
+        numberOfTrips,
+        meanTripDuration
       });
     }
   }, [isOpen, trips, allTrips, showAllTrips]);
@@ -617,7 +620,7 @@ const StatisticsModal = ({
         gap: '15px',
         width: '100%',
         overflowY: 'auto',
-        maxHeight: 'calc(70vh - 250px)', // Account for header, animation, toggle, and button
+        maxHeight: 'calc(70vh - 250px)',
         paddingRight: '10px',
         scrollbarWidth: 'thin',
         scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1)'
@@ -648,6 +651,15 @@ const StatisticsModal = ({
           fontFamily: '"National Park", sans-serif'
         }}>
           <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Durée totale: {stats.totalDuration.toFixed(1)} minutes</div>
+        </div>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          padding: '15px',
+          borderRadius: '4px',
+          textAlign: 'center',
+          fontFamily: '"National Park", sans-serif'
+        }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Durée moyenne par trajet: {stats.meanTripDuration.toFixed(1)} minutes</div>
         </div>
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',

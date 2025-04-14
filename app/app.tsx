@@ -85,6 +85,8 @@ type Trip = {
   max_speed: number;
   distances: number[];
   formatted_start_date: string;
+  elevations: number[];
+  d_plus: number[];
 };
 
 // Speed Slider component
@@ -422,6 +424,7 @@ const StatisticsModal = ({
     totalDuration: number;
     meanSpeed: number;
     maxSpeed: number;
+    dPlus: number;
     numberOfTrips: number;
     meanTripDuration: number;
   } | null>(null);
@@ -438,11 +441,13 @@ const StatisticsModal = ({
         const finalDuration = trip.timestamps[trip.timestamps.length - 1] / 60; // Convert seconds to minutes
         const finalSpeed = trip.speeds[trip.speeds.length - 1] || 0;
         const maxSpeed = trip.max_speed;
+        const dPlus = trip.d_plus[trip.d_plus.length - 1] || 0; // Get the last value of d_plus array
         return {
           distance: finalDistance,
           duration: finalDuration,
           speed: finalSpeed,
           max_speed: maxSpeed,
+          dPlus: dPlus
         };
       });
 
@@ -450,6 +455,7 @@ const StatisticsModal = ({
       const totalDuration = tripStats.reduce((sum, trip) => sum + trip.duration, 0);
       const meanSpeed = totalDuration > 0 ? (totalDistance / totalDuration) * 60 : 0; // km/h
       const maxSpeed = Math.max(...tripStats.map(trip => trip.max_speed));
+      const dPlus = tripStats.reduce((sum, trip) => sum + trip.dPlus, 0);
       const numberOfTrips = tripsToUse.length;
       const meanTripDuration = numberOfTrips > 0 ? totalDuration / numberOfTrips : 0;
 
@@ -458,6 +464,7 @@ const StatisticsModal = ({
         totalDuration,
         meanSpeed,
         maxSpeed,
+        dPlus,
         numberOfTrips,
         meanTripDuration
       });
@@ -642,6 +649,15 @@ const StatisticsModal = ({
           fontFamily: '"National Park", sans-serif'
         }}>
           <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Distance totale: {stats.totalDistance.toFixed(1)} km</div>
+        </div>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          padding: '15px',
+          borderRadius: '4px',
+          textAlign: 'center',
+          fontFamily: '"National Park", sans-serif'
+        }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>D+ total: {stats.dPlus} m</div>
         </div>
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',

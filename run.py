@@ -28,6 +28,8 @@ for trackID, d in df.groupby("trackID"):
             trackID=trackID,
             max_speed=float(track.max_speed),
             formatted_start_date=track.formatted_start_date,
+            elevations=values["elevation"],
+            d_plus=values["d_plus"],
         )
     )
 

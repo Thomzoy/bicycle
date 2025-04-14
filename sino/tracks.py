@@ -4,8 +4,44 @@ import pandas as pd
 from zoneinfo import ZoneInfo
 import geopy.distance
 import numpy as np
+import elevatr as elv
 
 target_timezone = pytz.timezone("Europe/Paris")
+
+def get_elevations(lon_col, lat_col):
+    bottom_left = (
+        float(lon_col.min()), 
+        float(lat_col.min()),
+    )
+
+    top_right = (
+        float(lon_col.max()), 
+        float(lat_col.max()),
+    )
+    
+    # Define the bounding box of the area of interest (min_lon, min_lat, max_lon, max_lat)
+    bbx = bottom_left + top_right
+    # Set the level of precision (between 0 and 14)
+    zoom = 12
+
+    # Access the elevation data
+    raster_raw = elv.get_elev_raster(locations=bbx, zoom=zoom, crs="EPSG:4326")
+    raster = raster_raw.to_numpy()
+    
+    def get_elevation(lon, lat, raster):
+        assert lon <= top_right[0] and lat <= top_right[1]
+        assert lon >= bottom_left[0] and lat >= bottom_left[1]
+        
+        get_lat_idx = lambda lat: int((lat - bottom_left[1]) / (top_right[1] - bottom_left[1]) * raster.shape[1])
+        get_lon_idx = lambda lon: int((lon - bottom_left[0]) / (top_right[0] - bottom_left[0]) * raster.shape[0])
+
+        lon_idx = min(get_lon_idx(lon), raster.shape[0] - 1)
+        lat_idx = min(get_lat_idx(lat), raster.shape[1] - 1)
+
+        return raster[lon_idx, lat_idx]
+    
+    elevations = [get_elevation(lon, lat, raster) for lon, lat in zip(lon_col, lat_col)]
+    return raster_raw,elevations
 
 def clean(
     points,
@@ -59,6 +95,39 @@ def clean(
     df["delta_sup"] = (df.delta > tracks_delta).astype(int)
     df["trackID_tmp"] = df["delta_sup"].cumsum()
     df = df.reset_index(drop=True).reset_index()
+    
+    raster_raw, elevations = get_elevations(df.dbLon, df.dbLat)
+    df["elevation"] = elevations
+
+    def clean_track(df_track, th):
+        min_point, max_point = 0, len(df_track)
+        for idx, speed in enumerate(df_track.nSpeed):
+            if speed > th:
+                min_point = idx
+                break
+        for idx, speed in enumerate(df_track.nSpeed[::-1]):
+            if speed > th:
+                max_point = idx
+                break
+        df_track = df_track.iloc[min_point : len(df_track) - max_point]
+
+        if df_track.empty:
+            return df_track
+
+        initial_elevation = df_track.elevation.iloc[0]
+        df_track["elevation_prev"] = df_track.elevation.shift()
+        df_track.iloc[0,-1] = initial_elevation # FillNaN
+        df_track["elevation_diff"] = df_track.elevation - df_track.elevation_prev
+        df_track["d_plus"] = np.where(df_track.elevation_diff > 0, df_track.elevation_diff, 0).cumsum()
+
+        df_track["dbLat_prev"] = df_track.dbLat.shift()
+        df_track["dbLon_prev"] = df_track.dbLon.shift()
+        df_track["dist"] = df_track.apply(distance, axis=1) / 1e3
+        df_track["duration"] = (df_track.date - df_track.date_prev).dt.seconds / 60
+        df_track["dist_total"] = df_track["dist"].cumsum()
+        df_track["duration_total"] = df_track["duration"].cumsum()
+        
+        return df_track
 
     def get_tracks(df):
         tracks = df.groupby("trackID_tmp", as_index=False).agg(
@@ -67,6 +136,7 @@ def clean(
             #mean_speed=("nSpeed", "mean"),
             max_speed=("nSpeed", "max"),
             dist_total=("dist_total", "max"),
+            d_plus_total=("d_plus", "max"),
         )
         tracks["duration"] = (tracks.end_date - tracks.start_date).dt.seconds / 60
         tracks["mean_speed"] = tracks.dist_total / (tracks.duration / 60)
@@ -85,25 +155,6 @@ def clean(
             (row.dbLat, row.dbLon), (row.dbLat_prev, row.dbLon_prev)
         ).m
 
-    def clean_track(df_track, th):
-        min_point, max_point = 0, len(df_track)
-        for idx, speed in enumerate(df_track.nSpeed):
-            if speed > th:
-                min_point = idx
-                break
-        for idx, speed in enumerate(df_track.nSpeed[::-1]):
-            if speed > th:
-                max_point = idx
-                break
-        df_track = df_track.iloc[min_point : len(df_track) - max_point]
-        df_track["dbLat_prev"] = df_track.dbLat.shift()
-        df_track["dbLon_prev"] = df_track.dbLon.shift()
-        df_track["dist"] = df_track.apply(distance, axis=1) / 1e3
-        df_track["duration"] = (df_track.date - df_track.date_prev).dt.seconds / 60
-        df_track["dist_total"] = df_track["dist"].cumsum()
-        df_track["duration_total"] = df_track["duration"].cumsum()
-        
-        return df_track
 
     cleaned_points = [
         clean_track(df_track, remove_start_end_points_speed)

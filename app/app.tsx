@@ -1037,8 +1037,8 @@ export default function App({
       >
         <Map reuseMaps mapStyle={mapStyle} />
       </DeckGL>
-      <BurgerMenuButton onClick={() => setIsSettingsOpen(true)} />
-      <StarIconButton onClick={() => setIsStatsOpen(true)} />
+      <BurgerMenuButton onClick={() => setIsSettingsOpen(!isSettingsOpen)} />
+      <StarIconButton onClick={() => setIsStatsOpen(!isStatsOpen)} />
       <SettingsMenu
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

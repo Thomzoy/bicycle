@@ -176,3 +176,8 @@ cython_debug/
 # node
 node_modules
 app/node_modules
+
+# cache
+cache/**/*
+
+maps/**/*

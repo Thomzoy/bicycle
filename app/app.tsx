@@ -283,9 +283,9 @@ const SettingsMenu = ({
           </label>
           <input
             type="range"
-            min="3"
-            max="15"
-            step="1"
+            min="10"
+            max="200"
+            step="10"
             value={animationSpeed}
             onChange={(e) => onAnimationSpeedChange(parseFloat(e.target.value))}
             style={{ width: '100%' }}
@@ -297,9 +297,9 @@ const SettingsMenu = ({
           </label>
           <input
             type="range"
-            min="100"
-            max="2000"
-            step="100"
+            min="1000"
+            max="15000"
+            step="1000"
             value={trailLength}
             onChange={(e) => onTrailLengthChange(parseInt(e.target.value))}
             style={{ width: '100%' }}
@@ -832,11 +832,11 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
 export default function App({
   buildings = DATA_URL.BUILDINGS,
   trips = DATA_URL.TRIPS,
-  trailLength = 1500,
+  trailLength = 3000,
   initialViewState = INITIAL_VIEW_STATE,
   mapStyle = MAP_STYLE,
   theme = DEFAULT_THEME,
-  initialAnimationSpeed = 10,
+  initialAnimationSpeed = 70,
 }: {
   buildings?: string | Building[];
   trips?: string | Trip[];

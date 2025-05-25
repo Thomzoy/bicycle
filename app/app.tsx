@@ -832,11 +832,11 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
 export default function App({
   buildings = DATA_URL.BUILDINGS,
   trips = DATA_URL.TRIPS,
-  trailLength = 3000,
+  trailLength = 15000,
   initialViewState = INITIAL_VIEW_STATE,
   mapStyle = MAP_STYLE,
   theme = DEFAULT_THEME,
-  initialAnimationSpeed = 70,
+  initialAnimationSpeed = 200,
 }: {
   buildings?: string | Building[];
   trips?: string | Trip[];

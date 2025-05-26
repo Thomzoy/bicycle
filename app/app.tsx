@@ -89,100 +89,6 @@ type Trip = {
   d_plus: number[];
 };
 
-// Speed Slider component
-const SpeedSlider = ({ value, onChange }: { value: number, onChange: (value: number) => void }) => {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: '30px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1,
-        background: 'rgba(0, 0, 0, 0.7)',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        color: 'white',
-        width: '300px'
-      }}
-    >
-      <div style={{ marginBottom: '5px', width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-        <span>Animation Speed: {value.toFixed(1)}x</span>
-      </div>
-      <input
-        type="range"
-        min="0.1"
-        max="5"
-        step="0.1"
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
-        style={{ width: '100%' }}
-      />
-    </div>
-  );
-};
-
-// Date Range Selector component
-const DateRangeSelector = ({
-  startDate,
-  endDate,
-  onStartDateChange,
-  onEndDateChange
-}: {
-  startDate: number;
-  endDate: number;
-  onStartDateChange: (date: number) => void;
-  onEndDateChange: (date: number) => void;
-}) => {
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toISOString().split('T')[0];
-  };
-
-  const parseDate = (dateString: string) => {
-    return Math.floor(new Date(dateString).getTime() / 1000);
-  };
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: '20px',
-        left: '20px',
-        zIndex: 1,
-        background: 'rgba(0, 0, 0, 0.7)',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        color: 'white',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px'
-      }}
-    >
-      <div>
-        <label style={{ display: 'block', marginBottom: '5px' }}>Start Date:</label>
-        <input
-          type="date"
-          value={formatDate(startDate)}
-          onChange={(e) => onStartDateChange(parseDate(e.target.value))}
-          style={{ padding: '5px', borderRadius: '4px' }}
-        />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '5px' }}>End Date:</label>
-        <input
-          type="date"
-          value={formatDate(endDate)}
-          onChange={(e) => onEndDateChange(parseDate(e.target.value))}
-          style={{ padding: '5px', borderRadius: '4px' }}
-        />
-      </div>
-    </div>
-  );
-};
-
 // Settings Menu component
 const SettingsMenu = ({
   isOpen,
@@ -878,7 +784,7 @@ export default function App({
     const r = Math.floor(255 * (1 - relativeTime));
     const g = Math.floor(255 * relativeTime);
     const b = 0;
-
+    return [10,250,10] as Color; // Use a fixed color for now, can be replaced with dynamic color logic
     return [r, g, b] as Color;
   };
 
@@ -953,8 +859,12 @@ export default function App({
       from: 0,
       to: loopLength,
       duration: (loopLength * 60) / animationSpeed,
-      repeat: Infinity,
-      onUpdate: setTime
+      repeat: 0,
+      onUpdate: setTime,
+      onComplete: () => {
+        // Keep time at the end to show all completed trips
+        setTime(loopLength);
+      }
     });
 
     setAnimation(newAnimation);
@@ -1002,10 +912,10 @@ export default function App({
       getPath: d => d.path,
       getTimestamps: d => d.timestamps,
       getColor: d => getTripColor(d),
-      opacity: 0.8,
-      widthMinPixels: 2,
+      opacity: 0.2,
+      widthMinPixels: 3,
       rounded: true,
-      trailLength: currentTrailLength,
+      trailLength: 999999, // Very large value to prevent fading
       currentTime: time,
       pickable: false
     }),

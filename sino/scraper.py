@@ -23,7 +23,7 @@ strServerTable = "\u001b"
 def encode(
     serverURL=strServerURL,
     Cmd="Proc_GetTrack",
-    Data="N'7026108732',N'1739574000',N'1739660399',N'100000'",  # ID, TimeStart, TimeEnd, NPoints
+    Data="N'7026108732',N'1739574000',N'1739660399',N'10000000'",  # ID, TimeStart, TimeEnd, NPoints
     Field="",
     Server="",
     AbsolutePage=1,
@@ -81,7 +81,7 @@ def _get_points(
         if end_date is None
         else datetime.timestamp(datetime.strptime(end_date, format))
     )
-    data_str = f"N'{strUser}',N'{int(start)}',N'{int(end)}',N'100000'"
+    data_str = f"N'{strUser}',N'{int(start)}',N'{int(end)}',N'10000000'"
 
     data = encode(
         Cmd="Proc_GetTrack",

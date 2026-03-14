@@ -674,7 +674,7 @@ const TrackInfoPanel = ({ trips, activeTrips }: {
 
 // ProgressBar component
 const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
-  const maxDistance = 1000; // 1000km goal
+  const maxDistance = 5000; // 1000km goal
   const [animatedProgress, setAnimatedProgress] = useState(0);
 
   useEffect(() => {

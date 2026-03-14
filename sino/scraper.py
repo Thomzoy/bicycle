@@ -5,10 +5,9 @@ import hashlib
 import time
 import requests
 from datetime import datetime
-import pytz
 import tqdm
 
-target_timezone = pytz.timezone("Europe/Paris")
+target_timezone = "Europe/Paris"
 
 strUser = os.environ["SINO_USER"]
 

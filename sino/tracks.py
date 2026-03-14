@@ -1,12 +1,11 @@
 from datetime import datetime
-import pytz
 import pandas as pd
 from zoneinfo import ZoneInfo
 import geopy.distance
 import numpy as np
 import elevatr as elv
 
-target_timezone = pytz.timezone("Europe/Paris")
+target_timezone = "Europe/Paris"
 
 
 def get_elevations_values(lon_col, lat_col):

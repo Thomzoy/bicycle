@@ -62,6 +62,25 @@ const INITIAL_VIEW_STATE: MapViewState = {
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
 
+const MAP_STYLES = [
+  {
+    label: 'Carto Dark Matter',
+    value: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json'
+  },
+  {
+    label: 'Carto Positron (Light)',
+    value: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+  },
+  {
+    label: 'Carto Voyager',
+    value: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
+  },
+  {
+    label: 'OSM (MapLibre Demo)',
+    value: 'https://demotiles.maplibre.org/style.json'
+  }
+];
+
 const landCover: Position[][] = [
   [
     [-74.0, 40.7],
@@ -100,7 +119,9 @@ const SettingsMenu = ({
   startDate,
   endDate,
   onStartDateChange,
-  onEndDateChange
+  onEndDateChange,
+  mapStyle,
+  onMapStyleChange
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -112,6 +133,8 @@ const SettingsMenu = ({
   endDate: number;
   onStartDateChange: (date: number) => void;
   onEndDateChange: (date: number) => void;
+  mapStyle: string;
+  onMapStyleChange: (value: string) => void;
 }) => {
   if (!isOpen) return null;
 
@@ -211,6 +234,29 @@ const SettingsMenu = ({
             style={{ width: '100%' }}
           />
         </div>
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <h3 style={{ margin: '0 0 10px 0', fontFamily: '"National Park", sans-serif' }}>Map Style</h3>
+        <select
+          value={mapStyle}
+          onChange={(e) => onMapStyleChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '8px',
+            borderRadius: '4px',
+            border: 'none',
+            background: 'rgba(255, 255, 255, 0.1)',
+            color: 'white',
+            fontFamily: '"National Park", sans-serif'
+          }}
+        >
+          {MAP_STYLES.map((style) => (
+            <option key={style.value} value={style.value} style={{ color: 'black' }}>
+              {style.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <button
@@ -672,13 +718,19 @@ const TrackInfoPanel = ({ trips, activeTrips }: {
   );
 };
 
-// ProgressBar component
-const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
-  const maxDistance = 5000; // 1000km goal
+// Monthly progress bar component
+const ProgressBar = ({
+  monthlyDistance,
+  daysLeft
+}: {
+  monthlyDistance: number;
+  daysLeft: number;
+}) => {
+  const maxDistance = 200;
   const [animatedProgress, setAnimatedProgress] = useState(0);
 
   useEffect(() => {
-    const progress = (totalDistance / maxDistance) * 100;
+    const progress = Math.min((monthlyDistance / maxDistance) * 100, 100);
     animate({
       from: 0,
       to: progress,
@@ -686,7 +738,7 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
       ease: easeOut,
       onUpdate: setAnimatedProgress
     });
-  }, [totalDistance]);
+  }, [monthlyDistance]);
 
   return (
     <div
@@ -728,7 +780,7 @@ const ProgressBar = ({ totalDistance }: { totalDistance: number }) => {
           fontWeight: 'bold',
           textShadow: '0 0 2px black'
         }}>
-          {totalDistance.toFixed(1)} km / {maxDistance} km
+          {monthlyDistance.toFixed(1)} km / {maxDistance} km ce mois-ci ({daysLeft} jour{daysLeft > 1 ? 's' : ''} restant{daysLeft > 1 ? 's' : ''})
         </div>
       </div>
     </div>
@@ -774,6 +826,7 @@ export default function App({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [activeTrips, setActiveTrips] = useState<{ [key: number]: { speed: number, distance: number } }>({});
+  const [selectedMapStyle, setSelectedMapStyle] = useState(mapStyle);
 
   // Function to calculate color based on trip start time
   const getTripColor = (trip: Trip): Color => {
@@ -932,10 +985,21 @@ export default function App({
     })
   ];
 
-  // Calculate total distance from all trips
-  const totalDistance = allTrips.reduce((sum, trip) => {
+  // Calculate total distance for the current month only
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const monthlyDistance = allTrips
+    .filter(trip => {
+      const tripDate = new Date(trip.start * 1000);
+      return tripDate.getMonth() === currentMonth && tripDate.getFullYear() === currentYear;
+    })
+    .reduce((sum, trip) => {
     return sum + (trip.distances[trip.distances.length - 1] || 0);
   }, 0);
+
+  const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const daysLeft = Math.max(daysInCurrentMonth - now.getDate(), 0);
 
   return (
     <>
@@ -945,7 +1009,7 @@ export default function App({
         initialViewState={initialViewState}
         controller={true}
       >
-        <Map reuseMaps mapStyle={mapStyle} />
+        <Map reuseMaps mapStyle={selectedMapStyle} />
       </DeckGL>
       <BurgerMenuButton onClick={() => setIsSettingsOpen(!isSettingsOpen)} />
       <StarIconButton onClick={() => setIsStatsOpen(!isStatsOpen)} />
@@ -960,6 +1024,8 @@ export default function App({
         endDate={endDate}
         onStartDateChange={setStartDate}
         onEndDateChange={setEndDate}
+        mapStyle={selectedMapStyle}
+        onMapStyleChange={setSelectedMapStyle}
       />
       <StatisticsModal
         isOpen={isStatsOpen}
@@ -969,7 +1035,7 @@ export default function App({
         allTrips={allTrips}
       />
       <TrackInfoPanel trips={filteredTrips} activeTrips={activeTrips} />
-      <ProgressBar totalDistance={totalDistance} />
+      <ProgressBar monthlyDistance={monthlyDistance} daysLeft={daysLeft} />
     </>
   );
 }

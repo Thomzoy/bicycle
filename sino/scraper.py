@@ -6,6 +6,9 @@ import time
 import requests
 from datetime import datetime
 import tqdm
+import json
+
+from github import Github
 
 target_timezone = "Europe/Paris"
 
@@ -135,3 +138,36 @@ def get_points(
         results.append(points)
         page += 1
     return results
+
+def get_points_from_github(
+    commit_sha = "1a7a55bd058383b392038b8707f6411f1abed049"
+):
+    """
+    Use this function to get previously generated data.json file, so we don't fetch everything again from server.
+    Plus, don't know why but starting around 2026-05-13, data from server is incomplete
+    """
+
+    repo_name = "Thomzoy/bicycle"
+    file_path = "data.json"
+
+    gh = Github()
+    repo = gh.get_repo(repo_name)
+
+    content_file = repo.get_contents(file_path, ref=commit_sha)
+
+    # Compatible avec encoding="base64" et encoding="none"
+    if getattr(content_file, "encoding", None) == "base64" and content_file.content:
+        raw = content_file.decoded_content.decode("utf-8")
+    else:
+        headers = {"Accept": "application/vnd.github.raw"}
+        raw = requests.get(content_file.download_url, headers=headers, timeout=60).text
+
+    points = json.loads(raw)
+
+    # Optionnel: sauvegarder la version exacte récupérée
+    with open("good_data.json", "w", encoding="utf-8") as f:
+        json.dump(points, f, ensure_ascii=False, indent=2)
+
+    gh.close()
+    len(points)
+    return points

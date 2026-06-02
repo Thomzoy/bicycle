@@ -1,13 +1,20 @@
 import json
+from datetime import timedelta, datetime
 
 import pandas as pd
 
 pd.options.mode.chained_assignment = None
 
-from sino.scraper import get_points
+from sino.scraper import get_points, get_points_from_github
 from sino.tracks import clean
 
-points = get_points()
+previous_paths = get_points_from_github()
+last_good_date = previous_paths[-1]["formatted_start_date"].split(",")[0]
+last_good_date = (datetime.strptime(last_good_date, "%Y-%m-%d") + timedelta(days=1)).strftime("%d%m%Y")
+
+print(f"Getting points from {last_good_date} until now")
+
+points = get_points(start_date=last_good_date)
 tracks, df = clean(
     points,
     tracks_delta=3,  # Minutes to split between tracks
@@ -15,7 +22,7 @@ tracks, df = clean(
     max_max_speed_for_valid_tracks=50,  # If max speed is above, track is removed (remove car)
     remove_start_end_points_speed=5,  # Starting and ending points below this speed are removed
     min_duration=3,  # Tracks shorter are dropped
-    min_date=(2025, 2, 12),
+    #min_date=(2025, 2, 12),
     max_date=None,
     get_elevations=True,
 )
@@ -54,6 +61,7 @@ for trackID, d in df.groupby("trackID"):
         )
     )
 
+paths = previous_paths + paths
 
 with open("./data.json", "w") as f:
     json.dump(paths, f)

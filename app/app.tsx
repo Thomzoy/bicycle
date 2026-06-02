@@ -60,11 +60,15 @@ const INITIAL_VIEW_STATE: MapViewState = {
   bearing: 15
 };
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 const MAP_STYLES = [
   {
     label: 'Carto Dark Matter',
+    value: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+  },
+  {
+    label: 'Carto Dark Matter - No labels',
     value: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json'
   },
   {
